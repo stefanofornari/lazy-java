@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.stefanofornari</groupId>
-            <artifactId>lazyjava-processor</artifactId>
+            <artifactId>lazyjava-annotation</artifactId>
             <version>${project.version}</version>
         </dependency>
 

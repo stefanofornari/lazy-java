@@ -1,30 +1,83 @@
 # LazyJava
 
-LazyJava is a Java annotation processor that generates boilerplate code for you.
+LazyJava is a Java annotation processor and Maven plugin that generates factory methods and weaves runtime parameter validation into methods and constructors using ByteBuddy.
 
-## Features
+## Modules
 
-### `@£` - Factory Method Generation
+- `lazyjava-annotation` — annotations (`@£` / `@LClass`, `@NonNull`, `@NonBlank`, `@NonEmpty`) and the annotation processor that generates package-level `£` interfaces with static factory methods.
+- `lazyjava-core` — tests and usage examples for the annotation processor.
+- `lazyjava-maven-plugin` — Maven plugin that instruments compiled classes at build time so runtime validation is enforced without manual agent setup.
+- `lazyjava-examples` — sample project demonstrating end-to-end usage.
 
-Annotate your class with `@£` to generate static factory methods:
+## Usage
 
-```java
-@£
-public class Person {
-    public Person() {}
-    public Person(String name, int age) {}
-}
+### 1. Add dependencies
 
-// Usage:
-£Person.Person();
-£Person.Person("John", 30);
+Add the annotation processor and Maven plugin to your project:
+
+```xml
+<dependency>
+    <groupId>com.github.stefanofornari</groupId>
+    <artifactId>lazyjava-annotation</artifactId>
+    <version>1.0.0</version>
+</dependency>
 ```
 
-**Alias:** `@LClass` is also supported for users who cannot type £.
+### 2. Register the Maven plugin
 
-### `@NonNull`, `@NonBlank`, `@NonEmpty` - Parameter Validation
+Wire the `lazyjava-maven-plugin` into your build so validation is woven after compilation:
 
-Annotate method parameters to generate validation methods that call `Safe` default methods:
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>com.github.stefanofornari</groupId>
+            <artifactId>lazyjava-maven-plugin</artifactId>
+            <version>1.0.0</version>
+        </plugin>
+    </plugins>
+</build>
+```
+
+The plugin runs during `process-classes` and instruments your compiled classes automatically. No additional runtime agent setup is required.
+
+### 3. Use the annotations
+
+Annotate classes with `@£` or `@LClass` to generate static factory methods in a package-level `£` interface:
+
+```java
+package com.example;
+
+import ste.lazyjava.annotation.£;
+
+@£
+public class Person {
+    private String name;
+    private int age;
+
+    public Person() {
+        this("Unknown", 0);
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+Import the generated factory interface and use it directly:
+
+```java
+import static com.example.£.*;
+
+Person p = Person();
+Person p2 = Person("John", 30);
+```
+
+### 4. Validate parameters at runtime
+
+Use `@NonNull`, `@NonBlank`, and `@NonEmpty` on method or constructor parameters. The Maven plugin injects ByteBuddy advice so violations throw `IllegalArgumentException` automatically:
 
 ```java
 @£
@@ -33,54 +86,18 @@ public class UserService {
         // method body
     }
 }
-
-// £Processor generates:
-// public class £UserService implements Safe {
-//     public static UserService UserService(String name, String email, String username) {
-//         return new UserService(name, email, username);
-//     }
-// }
-//
-// £SafeProcessor generates:
-// public class £SafeUserService extends £UserService {
-//     public void validateRegister(String name, String email, String username) {
-//         requireNonNull(name, "name");
-//         requireNonBlank(email, "email");
-//         requireNonEmpty(username, "username");
-//     }
-// }
-
-// Usage:
-£UserService service = £UserService.UserService();
-£SafeUserService validator = new £SafeUserService();
-validator.validateRegister(name, email, username);
-service.register(name, email, username);
 ```
 
-## Available Validation Annotations
+| Annotation | Target | Fails when |
+|------------|--------|------------|
+| `@NonNull` | parameter | value is `null` |
+| `@NonBlank` | parameter | value is `null` or blank |
+| `@NonEmpty` | parameter | value is `null` or empty |
 
-| Annotation | Target | Generated Call |
-|------------|--------|----------------|
-| `@NonNull` | `PARAMETER` | `Safe.requireNonNull(param, "param")` |
-| `@NonBlank` | `PARAMETER` | `Safe.requireNonBlank(param, "param")` |
-| `@NonEmpty` | `PARAMETER` | `Safe.requireNonEmpty(param, "param")` |
+### 5. Requirements
 
-## Requirements
-
-- Java 11+
+- Java 21+
 - Maven 3.6+
-
-## Installation
-
-Add the processor dependency to your project:
-
-```xml
-<dependency>
-    <groupId>com.github.stefanofornari</groupId>
-    <artifactId>lazyjava-processor</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
-```
 
 ## License
 
