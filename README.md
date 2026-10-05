@@ -33,7 +33,7 @@ Wire the `lazyjava-maven-plugin` into your build so validation is woven after co
         <plugin>
             <groupId>com.github.stefanofornari</groupId>
             <artifactId>lazyjava-maven-plugin</artifactId>
-            <version>1.0.0</version>
+            <version>0.0.0</version>
         </plugin>
     </plugins>
 </build>
