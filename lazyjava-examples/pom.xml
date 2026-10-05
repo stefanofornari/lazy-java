@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.stefanofornari</groupId>
         <artifactId>lazyjava-parent</artifactId>
-        <version>0.0.0</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>lazyjava-examples</artifactId>
