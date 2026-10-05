@@ -14,9 +14,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package ste.lazyjava;
+package ste.lazyjava.processor;
 
 import org.junit.jupiter.api.Test;
+
 import static ste.lazyjava.£.Person;
 
 class LazyJavaProcessorTest {
@@ -25,7 +26,7 @@ class LazyJavaProcessorTest {
     void generated_lazyjava_class_should_work() {
         var p1 = Person();
         var p2 = Person("John", 30);
-        
+
         assert p1.toString().equals("Person{name='Unknown', age=0}");
         assert p2.toString().equals("Person{name='John', age=30}");
     }

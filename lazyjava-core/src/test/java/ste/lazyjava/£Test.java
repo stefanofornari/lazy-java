@@ -16,6 +16,7 @@
  */
 package ste.lazyjava;
 
+import ste.lazyjava.processor.Person;
 import org.junit.jupiter.api.Test;
 import static ste.lazyjava.£.Person;
 
