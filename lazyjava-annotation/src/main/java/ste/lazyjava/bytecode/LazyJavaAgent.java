@@ -39,9 +39,9 @@ public class LazyJavaAgent {
             .type(nameStartsWith("ste.lazyjava."))
             .transform((builder, typeDescription, classLoader, module, protectionDomain) ->
                 builder
-                    .visit(Advice.to(NonNullMethodAdvice.class)
+                    .visit(Advice.to(ValidatorMethodAdvice.class)
                         .on(isMethod().and(not(isAbstract()))))
-                    .visit(Advice.to(NonNullConstructorAdvice.class)
+                    .visit(Advice.to(ValidatorConstructorAdvice.class)
                         .on(isConstructor()))
             )
             .installOn(inst);

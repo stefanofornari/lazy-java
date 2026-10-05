@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
 import static org.assertj.core.api.BDDAssertions.thenCode;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 
-class AdviceTest {
+class ValidatorAdviceTest {
 
     @SuppressWarnings("unused")
     private static class SampleTarget {
@@ -57,7 +57,7 @@ class AdviceTest {
     void method_nonNull_shouldThrow_whenNull() throws Exception {
         Method method = getMethod("nonNullParam", String.class);
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{null}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{null}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("val must not be null");
     }
@@ -66,7 +66,7 @@ class AdviceTest {
     void method_nonNull_shouldPass_whenValid() throws Exception {
         Method method = getMethod("nonNullParam", String.class);
 
-        thenCode(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{"hello"}))
+        thenCode(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{"hello"}))
             .doesNotThrowAnyException();
     }
 
@@ -74,7 +74,7 @@ class AdviceTest {
     void method_nonBlank_shouldThrow_whenNull() throws Exception {
         Method method = getMethod("nonBlankParam", String.class);
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{null}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{null}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("val must be non blank");
     }
@@ -83,7 +83,7 @@ class AdviceTest {
     void method_nonBlank_shouldThrow_whenBlank() throws Exception {
         Method method = getMethod("nonBlankParam", String.class);
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{"   "}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{"   "}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("val must be non blank");
     }
@@ -92,7 +92,7 @@ class AdviceTest {
     void method_nonBlank_shouldPass_whenValid() throws Exception {
         Method method = getMethod("nonBlankParam", String.class);
 
-        thenCode(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{"valid"}))
+        thenCode(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{"valid"}))
             .doesNotThrowAnyException();
     }
 
@@ -100,7 +100,7 @@ class AdviceTest {
     void method_nonEmpty_shouldThrow_whenNull() throws Exception {
         Method method = getMethod("nonEmptyParam", String.class);
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{null}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{null}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("val must be non empty");
     }
@@ -109,7 +109,7 @@ class AdviceTest {
     void method_nonEmpty_shouldThrow_whenEmpty() throws Exception {
         Method method = getMethod("nonEmptyParam", String.class);
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{""}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{""}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("val must be non empty");
     }
@@ -118,7 +118,7 @@ class AdviceTest {
     void method_nonEmpty_shouldPass_whenValid() throws Exception {
         Method method = getMethod("nonEmptyParam", String.class);
 
-        thenCode(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{"a"}))
+        thenCode(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{"a"}))
             .doesNotThrowAnyException();
     }
 
@@ -126,15 +126,15 @@ class AdviceTest {
     void method_multipleParams_shouldFail_onFirstError() throws Exception {
         Method method = getMethod("multipleParams", String.class, String.class, String.class);
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{null, "valid", "valid"}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{null, "valid", "valid"}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("a must not be null");
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{"valid", "  ", "valid"}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{"valid", "  ", "valid"}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("b must be non blank");
 
-        thenThrownBy(() -> NonNullMethodAdvice.onMethodEnter(method, new Object[]{"valid", "valid", ""}))
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{"valid", "valid", ""}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("c must be non empty");
     }
@@ -145,7 +145,7 @@ class AdviceTest {
     void constructor_shouldThrow_whenNonNullParamIsNull() throws Exception {
         Constructor<SampleTarget> constructor = getConstructor();
 
-        thenThrownBy(() -> NonNullConstructorAdvice.onMethodEnter(constructor, new Object[]{null, "email@test.com", "user123"}))
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{null, "email@test.com", "user123"}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("name must not be null");
     }
@@ -154,7 +154,7 @@ class AdviceTest {
     void constructor_shouldThrow_whenNonBlankParamIsBlank() throws Exception {
         Constructor<SampleTarget> constructor = getConstructor();
 
-        thenThrownBy(() -> NonNullConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", "   ", "user123"}))
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", "   ", "user123"}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("email must be non blank");
     }
@@ -163,7 +163,7 @@ class AdviceTest {
     void constructor_shouldThrow_whenNonEmptyParamIsEmpty() throws Exception {
         Constructor<SampleTarget> constructor = getConstructor();
 
-        thenThrownBy(() -> NonNullConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", "email@test.com", ""}))
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", "email@test.com", ""}))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("username must be non empty");
     }
@@ -172,7 +172,7 @@ class AdviceTest {
     void constructor_shouldPass_whenAllParametersAreValid() throws Exception {
         Constructor<SampleTarget> constructor = getConstructor();
 
-        thenCode(() -> NonNullConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", "email@test.com", "user123"}))
+        thenCode(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", "email@test.com", "user123"}))
             .doesNotThrowAnyException();
     }
 }

@@ -18,7 +18,6 @@ package ste.lazyjava.processor;
 
 import com.google.auto.service.AutoService;
 import ste.lazyjava.annotation.£;
-import ste.lazyjava.annotation.LClass;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
