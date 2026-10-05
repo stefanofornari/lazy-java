@@ -24,7 +24,7 @@ import ste.lazyjava.annotation.NonNull;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-public class NonNullMethodAdvice {
+public class ValidatorMethodAdvice {
 
     @Advice.OnMethodEnter
     public static void onMethodEnter(@Advice.Origin Method method, @Advice.AllArguments Object[] args) {

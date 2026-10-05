@@ -28,8 +28,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import ste.lazyjava.bytecode.NonNullConstructorAdvice;
-import ste.lazyjava.bytecode.NonNullMethodAdvice;
+import ste.lazyjava.bytecode.ValidatorConstructorAdvice;
+import ste.lazyjava.bytecode.ValidatorMethodAdvice;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,9 +87,9 @@ public class LazyJavaMojo extends AbstractMojo {
                 try {
                     new ByteBuddy()
                         .redefine(typePool.describe(className).resolve(), classFileLocator)
-                        .visit(Advice.to(NonNullMethodAdvice.class)
+                        .visit(Advice.to(ValidatorMethodAdvice.class)
                             .on(ElementMatchers.isMethod().and(ElementMatchers.not(ElementMatchers.isAbstract()))))
-                        .visit(Advice.to(NonNullConstructorAdvice.class)
+                        .visit(Advice.to(ValidatorConstructorAdvice.class)
                             .on(ElementMatchers.isConstructor()))
                         .make()
                         .saveIn(outputDirectory);

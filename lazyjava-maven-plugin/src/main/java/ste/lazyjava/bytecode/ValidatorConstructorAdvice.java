@@ -24,7 +24,7 @@ import ste.lazyjava.annotation.NonNull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 
-public class NonNullConstructorAdvice {
+public class ValidatorConstructorAdvice {
 
     @Advice.OnMethodEnter
     public static void onMethodEnter(@Advice.Origin Constructor<?> constructor, @Advice.AllArguments Object[] args) {

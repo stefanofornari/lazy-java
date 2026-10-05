@@ -179,6 +179,14 @@
                     <groupId>com.github.stefanofornari</groupId>
                     <artifactId>lazyjava-maven-plugin</artifactId>
                     <version>${project.version}</version>
+                    <executions>
+                        <execution>
+                            <id>weave-lazyjava</id>
+                            <goals>
+                                <goal>weave</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
