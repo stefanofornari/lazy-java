@@ -32,7 +32,6 @@ import ste.lazyjava.bytecode.ValidatorConstructorAdvice;
 import ste.lazyjava.bytecode.ValidatorMethodAdvice;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -69,10 +68,21 @@ public class LazyJavaMojo extends AbstractMojo {
                     .collect(Collectors.toList());
             }
 
-            ClassFileLocator classFileLocator = new ClassFileLocator.Compound(
-                ClassFileLocator.ForFolder.of(outputDirectory, net.bytebuddy.ClassFileVersion.ofJavaVersion(11)),
-                ClassFileLocator.ForClassLoader.of(Thread.currentThread().getContextClassLoader())
-            );
+            // 1. Build class file locators that include project dependencies (classpath elements)
+            List<ClassFileLocator> locators = new java.util.ArrayList<>();
+            locators.add(new ClassFileLocator.ForFolder(outputDirectory));
+
+            for (String element : project.getCompileClasspathElements()) {
+                File file = new File(element);
+                if (file.isDirectory()) {
+                    locators.add(new ClassFileLocator.ForFolder(file));
+                } else if (file.getName().endsWith(".jar")) {
+                    locators.add(ClassFileLocator.ForJarFile.of(file)); // Fixed: using .of(file) factory method
+                }
+            }
+            locators.add(ClassFileLocator.ForClassLoader.of(Thread.currentThread().getContextClassLoader()));
+
+            ClassFileLocator classFileLocator = new ClassFileLocator.Compound(locators);
             TypePool typePool = TypePool.Default.of(classFileLocator);
 
             int instrumentedCount = 0;
@@ -102,7 +112,7 @@ public class LazyJavaMojo extends AbstractMojo {
 
             getLog().info("Successfully instrumented " + instrumentedCount + " classes.");
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new MojoExecutionException("Error weaving parameter validation bytecode", e);
         }
     }
