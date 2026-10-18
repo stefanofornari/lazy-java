@@ -34,6 +34,13 @@ Wire the `lazyjava-maven-plugin` into your build so validation is woven after co
             <groupId>com.github.stefanofornari</groupId>
             <artifactId>lazyjava-maven-plugin</artifactId>
             <version>0.0.0</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>weave</goal>
+                    </goals>
+                </execution>
+            </executions>
         </plugin>
     </plugins>
 </build>
