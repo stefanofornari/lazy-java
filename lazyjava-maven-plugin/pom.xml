@@ -11,13 +11,14 @@
     <artifactId>lazyjava-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>LazyJava Maven Plugin</name>
+    <version>0.0.1-SNAPSHOT</version>
 
     <dependencies>
         <!-- Internal Modules -->
         <dependency>
             <groupId>com.github.stefanofornari</groupId>
             <artifactId>lazyjava-annotation</artifactId>
-            <version>${project.version}</version>
+            <version>0.0.1</version>
         </dependency>
 
         <!-- Maven Plugin APIs -->
@@ -44,7 +45,6 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.15.5</version>
         </dependency>
 
         <!-- Test Dependencies (Inherited version from parent) -->
@@ -80,6 +80,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

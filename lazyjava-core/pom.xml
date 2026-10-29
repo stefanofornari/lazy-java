@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.github.stefanofornari</groupId>
             <artifactId>lazyjava-annotation</artifactId>
-            <version>${project.version}</version>
+            <version>0.0.1</version>
         </dependency>
 
         <dependency>
@@ -35,6 +35,18 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.20.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stefanofornari</groupId>
+            <artifactId>lambda-loop</artifactId>
+            <version>0.6.3</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
@@ -98,6 +110,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
