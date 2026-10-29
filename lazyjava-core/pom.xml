@@ -10,7 +10,7 @@
 
     <groupId>com.github.stefanofornari</groupId>
     <artifactId>lazyjava-core</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>LazyJava Core</name>
 
@@ -117,11 +117,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:git:https://github.com/stefanofornari/lazy-java.git</connection>
-        <developerConnection>scm:git:git@github.com:stefanofornari/lazy-java.git</developerConnection>
-        <url>https://github.com/stefanofornari/lazy-java</url>
-        <tag>lazyjava-core-0.0.1</tag>
-    </scm>
 </project>
