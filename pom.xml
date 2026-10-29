@@ -197,7 +197,7 @@
                 <plugin>
                     <groupId>com.github.stefanofornari</groupId>
                     <artifactId>lazyjava-maven-plugin</artifactId>
-                    <version>${project.version}</version>
+                    <version>0.0.1</version>
                     <executions>
                         <execution>
                             <id>weave-lazyjava</id>
