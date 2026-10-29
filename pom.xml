@@ -21,7 +21,7 @@
 
     <groupId>com.github.stefanofornari</groupId>
     <artifactId>lazyjava-parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>LazyJava Parent Project</name>
     <description>Java annotation processor and ByteBuddy-based runtime parameter validation</description>
