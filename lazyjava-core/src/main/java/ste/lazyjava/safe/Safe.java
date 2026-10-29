@@ -24,23 +24,23 @@ import static ste.lloop.Loop.on;
 
 public interface Safe {
 
-    default void ifNotNull(final Object o, final Runnable r) {
+    default void ifNotNull(final Object o, final Runnable doIfNull) {
         if (o != null) {
-            r.run();
+            doIfNull.run();
         }
     }
 
-    default void ifNull(final Object o, final Runnable t) {
+    default void ifNull(final Object o, final Runnable doIfNull) {
         if (o == null) {
-            t.run();
+            doIfNull.run();
         }
     }
 
-    default void ifNull(final Object o, final Runnable t, final Runnable f) {
+    default void ifNull(final Object o, final Runnable doIfNull, final Runnable doIfNotNull) {
         if (o == null) {
-            t.run(); // true
+            doIfNull.run(); // true
         } else {
-            f.run(); // false
+            doIfNotNull.run(); // false
         }
     }
 
