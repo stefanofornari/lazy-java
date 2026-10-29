@@ -18,12 +18,34 @@ package ste.lazyjava.bytecode;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
+import ste.lazyjava.annotation.NonBlank;
+import ste.lazyjava.annotation.NonEmpty;
+import ste.lazyjava.annotation.NonNull;
 import java.lang.instrument.Instrumentation;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
+/**
+ * Java agent that installs ByteBuddy-based validation advice for LazyJava annotations.
+ *
+ * <p>This agent instruments classes in the {@code ste.lazyjava} package to add
+ * runtime validation for {@link NonNull}, {@link NonBlank}, and {@link NonEmpty}
+ * annotations on method and constructor parameters.
+ */
 public class LazyJavaAgent {
 
+    /**
+     * Creates a new LazyJavaAgent instance.
+     */
+    public LazyJavaAgent() {
+    }
+
+    /**
+     * Installs the agent into the given instrumentation.
+     *
+     * @param args   agent arguments (unused)
+     * @param inst   the instrumentation instance
+     */
     public static void install(String args, Instrumentation inst) {
         new AgentBuilder.Default()
             .with(AgentBuilder.Listener.StreamWriting.toSystemOut())

@@ -51,18 +51,28 @@ public class LazyJavaMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.outputDirectory}", required = true)
     private File outputDirectory;
 
+    @Parameter(defaultValue = "${project.build.testOutputDirectory}")
+    private File testOutputDirectory;
+
     @Override
     public void execute() throws MojoExecutionException {
-        if (!outputDirectory.exists()) {
-            getLog().info("No classes found to instrument.");
+        weave(outputDirectory);
+        if (testOutputDirectory != null && testOutputDirectory.exists()) {
+            weave(testOutputDirectory);
+        }
+    }
+
+    private void weave(File outputDir) throws MojoExecutionException {
+        if (!outputDir.exists()) {
+            getLog().info("No classes found to instrument in: " + outputDir.getAbsolutePath());
             return;
         }
 
-        getLog().info("Weaving parameter validation into classes in: " + outputDirectory.getAbsolutePath());
+        getLog().info("Weaving parameter validation into classes in: " + outputDir.getAbsolutePath());
 
         try {
             List<Path> classFiles;
-            try (Stream<Path> stream = Files.walk(outputDirectory.toPath())) {
+            try (Stream<Path> stream = Files.walk(outputDir.toPath())) {
                 classFiles = stream
                     .filter(p -> p.toString().endsWith(".class"))
                     .collect(Collectors.toList());
@@ -70,14 +80,14 @@ public class LazyJavaMojo extends AbstractMojo {
 
             // 1. Build class file locators that include project dependencies (classpath elements)
             List<ClassFileLocator> locators = new java.util.ArrayList<>();
-            locators.add(new ClassFileLocator.ForFolder(outputDirectory));
+            locators.add(new ClassFileLocator.ForFolder(outputDir));
 
             for (String element : project.getCompileClasspathElements()) {
                 File file = new File(element);
                 if (file.isDirectory()) {
                     locators.add(new ClassFileLocator.ForFolder(file));
                 } else if (file.getName().endsWith(".jar")) {
-                    locators.add(ClassFileLocator.ForJarFile.of(file)); // Fixed: using .of(file) factory method
+                    locators.add(ClassFileLocator.ForJarFile.of(file));
                 }
             }
             locators.add(ClassFileLocator.ForClassLoader.of(Thread.currentThread().getContextClassLoader()));
@@ -88,7 +98,7 @@ public class LazyJavaMojo extends AbstractMojo {
             int instrumentedCount = 0;
 
             for (Path classFile : classFiles) {
-                String className = getClassName(outputDirectory.toPath(), classFile);
+                String className = getClassName(outputDir.toPath(), classFile);
 
                 if (className.contains("$")) {
                     continue;
@@ -102,7 +112,7 @@ public class LazyJavaMojo extends AbstractMojo {
                         .visit(Advice.to(ValidatorConstructorAdvice.class)
                             .on(ElementMatchers.isConstructor()))
                         .make()
-                        .saveIn(outputDirectory);
+                        .saveIn(outputDir);
 
                     instrumentedCount++;
                 } catch (Exception e) {
@@ -110,7 +120,7 @@ public class LazyJavaMojo extends AbstractMojo {
                 }
             }
 
-            getLog().info("Successfully instrumented " + instrumentedCount + " classes.");
+            getLog().info("Successfully instrumented " + instrumentedCount + " classes in: " + outputDir.getAbsolutePath());
 
         } catch (Exception e) {
             throw new MojoExecutionException("Error weaving parameter validation bytecode", e);

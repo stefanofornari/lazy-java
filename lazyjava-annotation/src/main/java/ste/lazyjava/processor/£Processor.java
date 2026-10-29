@@ -56,6 +56,13 @@ import java.util.logging.Logger;
 @AutoService(Processor.class)
 public class £Processor extends AbstractProcessor {
 
+    /**
+     * Creates a new £Processor instance.
+     */
+    public £Processor() {
+        super();
+    }
+
     private final Logger LOG = Logger.getLogger(getClass().getName());
     private final Map<String, List<TypeElement>> classesByPackage = new LinkedHashMap<>();
 

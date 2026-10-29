@@ -23,9 +23,30 @@ import ste.lazyjava.annotation.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
+import java.util.Collection;
 
+/**
+ * ByteBuddy advice that validates constructor parameters annotated with
+ * {@link NonNull}, {@link NonBlank}, and {@link NonEmpty}.
+ *
+ * <p>This advice is woven into constructors at runtime by the {@link LazyJavaAgent}
+ * and performs validation on each parameter before the constructor body executes.
+ */
 public class ValidatorConstructorAdvice {
 
+    /**
+     * Creates a new ValidatorConstructorAdvice instance.
+     */
+    public ValidatorConstructorAdvice() {
+    }
+
+    /**
+     * Validates constructor parameters on method entry.
+     *
+     * @param constructor the constructor being invoked
+     * @param args        the constructor arguments
+     * @throws IllegalArgumentException if any parameter validation fails
+     */
     @Advice.OnMethodEnter
     public static void onMethodEnter(@Advice.Origin Constructor<?> constructor, @Advice.AllArguments Object[] args) {
         Parameter[] parameters = constructor.getParameters();
@@ -45,7 +66,16 @@ public class ValidatorConstructorAdvice {
             }
 
             if (param.isAnnotationPresent(NonEmpty.class)) {
-                if (arg == null || (arg instanceof String s && s.isEmpty())) {
+                if (arg == null) {
+                    throw new IllegalArgumentException(name + " must be non empty");
+                }
+                if (arg instanceof String s && s.isEmpty()) {
+                    throw new IllegalArgumentException(name + " must be non empty");
+                }
+                if (arg instanceof Collection<?> c && c.isEmpty()) {
+                    throw new IllegalArgumentException(name + " must be non empty");
+                }
+                if (arg.getClass().isArray() && java.lang.reflect.Array.getLength(arg) == 0) {
                     throw new IllegalArgumentException(name + " must be non empty");
                 }
             }

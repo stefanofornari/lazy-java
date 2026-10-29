@@ -22,7 +22,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a CharSequence parameter as non-empty (not null, not empty).
+ * Marks a parameter as non-empty (not null, not empty).
+ *
+ * <p>Supported types:
+ * <ul>
+ *   <li>{@code CharSequence} (e.g., {@code String}) - checks {@code !isEmpty()}</li>
+ *   <li>{@code Collection} - checks {@code !isEmpty()}</li>
+ *   <li>Arrays (both object and primitive) - checks {@code length > 0}</li>
+ * </ul>
  *
  * <p>The generated validator will call:
  * {@code Safe.requireNonEmpty(param, "paramName")}
@@ -30,6 +37,9 @@ import java.lang.annotation.Target;
  * <p>Usage:
  * <pre>
  * public void save(@NonEmpty String filename) { ... }
+ * public void process(@NonEmpty {@code List<Item>} items) { ... }
+ * public void handle(@NonEmpty String[] tags) { ... }
+ * public void compute(@NonEmpty int[] values) { ... }
  * </pre>
  */
 @Target(ElementType.PARAMETER)

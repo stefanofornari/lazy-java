@@ -23,6 +23,8 @@ import ste.lazyjava.annotation.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.BDDAssertions.thenCode;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
@@ -34,11 +36,19 @@ class ValidatorAdviceTest {
 
         public SampleTarget(@NonNull String name, @NonBlank String email, @NonEmpty String username) {}
 
+        public SampleTarget(@NonNull String name, @NonEmpty List<String> items, @NonEmpty String[] tags, @NonEmpty int[] values) {}
+
         public void nonNullParam(@NonNull String val) {}
 
         public void nonBlankParam(@NonBlank String val) {}
 
         public void nonEmptyParam(@NonEmpty String val) {}
+
+        public void nonEmptyCollectionParam(@NonEmpty List<String> items) {}
+
+        public void nonEmptyArrayParam(@NonEmpty String[] items) {}
+
+        public void nonEmptyPrimitiveArrayParam(@NonEmpty int[] items) {}
 
         public void multipleParams(@NonNull String a, @NonBlank String b, @NonEmpty String c) {}
     }
@@ -49,6 +59,10 @@ class ValidatorAdviceTest {
 
     private Constructor<SampleTarget> getConstructor() throws NoSuchMethodException {
         return SampleTarget.class.getDeclaredConstructor(String.class, String.class, String.class);
+    }
+
+    private Constructor<SampleTarget> getCollectionArrayConstructor() throws NoSuchMethodException {
+        return SampleTarget.class.getDeclaredConstructor(String.class, List.class, String[].class, int[].class);
     }
 
     // --- NonNullMethodAdvice Tests ---
@@ -122,6 +136,88 @@ class ValidatorAdviceTest {
             .doesNotThrowAnyException();
     }
 
+    // --- NonEmpty with Collections Tests ---
+
+    @Test
+    void method_nonEmptyCollection_shouldThrow_whenNull() throws Exception {
+        Method method = getMethod("nonEmptyCollectionParam", List.class);
+
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{null}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void method_nonEmptyCollection_shouldThrow_whenEmpty() throws Exception {
+        Method method = getMethod("nonEmptyCollectionParam", List.class);
+
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{List.of()}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void method_nonEmptyCollection_shouldPass_whenValid() throws Exception {
+        Method method = getMethod("nonEmptyCollectionParam", List.class);
+
+        thenCode(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{List.of("a")}))
+            .doesNotThrowAnyException();
+    }
+
+    // --- NonEmpty with Arrays Tests ---
+
+    @Test
+    void method_nonEmptyArray_shouldThrow_whenNull() throws Exception {
+        Method method = getMethod("nonEmptyArrayParam", String[].class);
+
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{null}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void method_nonEmptyArray_shouldThrow_whenEmpty() throws Exception {
+        Method method = getMethod("nonEmptyArrayParam", String[].class);
+
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{new String[0]}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void method_nonEmptyArray_shouldPass_whenValid() throws Exception {
+        Method method = getMethod("nonEmptyArrayParam", String[].class);
+
+        thenCode(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{new String[]{"a"}}))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void method_nonEmptyPrimitiveArray_shouldThrow_whenNull() throws Exception {
+        Method method = getMethod("nonEmptyPrimitiveArrayParam", int[].class);
+
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{null}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void method_nonEmptyPrimitiveArray_shouldThrow_whenEmpty() throws Exception {
+        Method method = getMethod("nonEmptyPrimitiveArrayParam", int[].class);
+
+        thenThrownBy(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{new int[0]}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void method_nonEmptyPrimitiveArray_shouldPass_whenValid() throws Exception {
+        Method method = getMethod("nonEmptyPrimitiveArrayParam", int[].class);
+
+        thenCode(() -> ValidatorMethodAdvice.onMethodEnter(method, new Object[]{new int[]{1}}))
+            .doesNotThrowAnyException();
+    }
+
     @Test
     void method_multipleParams_shouldFail_onFirstError() throws Exception {
         Method method = getMethod("multipleParams", String.class, String.class, String.class);
@@ -173,6 +269,70 @@ class ValidatorAdviceTest {
         Constructor<SampleTarget> constructor = getConstructor();
 
         thenCode(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", "email@test.com", "user123"}))
+            .doesNotThrowAnyException();
+    }
+
+    // --- NonNullConstructorAdvice with Collections and Arrays Tests ---
+
+    @Test
+    void constructor_withCollection_shouldThrow_whenNull() throws Exception {
+        Constructor<SampleTarget> constructor = getCollectionArrayConstructor();
+
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", null, new String[]{"tag"}, new int[]{1}}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void constructor_withCollection_shouldThrow_whenEmpty() throws Exception {
+        Constructor<SampleTarget> constructor = getCollectionArrayConstructor();
+
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", List.of(), new String[]{"tag"}, new int[]{1}}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("items must be non empty");
+    }
+
+    @Test
+    void constructor_withArray_shouldThrow_whenNull() throws Exception {
+        Constructor<SampleTarget> constructor = getCollectionArrayConstructor();
+
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", List.of("item"), null, new int[]{1}}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("tags must be non empty");
+    }
+
+    @Test
+    void constructor_withArray_shouldThrow_whenEmpty() throws Exception {
+        Constructor<SampleTarget> constructor = getCollectionArrayConstructor();
+
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", List.of("item"), new String[0], new int[]{1}}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("tags must be non empty");
+    }
+
+    @Test
+    void constructor_withPrimitiveArray_shouldThrow_whenNull() throws Exception {
+        Constructor<SampleTarget> constructor = getCollectionArrayConstructor();
+
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", List.of("item"), new String[]{"tag"}, null}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("values must be non empty");
+    }
+
+    @Test
+    void constructor_withPrimitiveArray_shouldThrow_whenEmpty() throws Exception {
+        Constructor<SampleTarget> constructor = getCollectionArrayConstructor();
+
+        thenThrownBy(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", List.of("item"), new String[]{"tag"}, new int[0]}))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("values must be non empty");
+    }
+
+    @Test
+    void constructor_withCollectionAndArrays_shouldPass_whenValid() throws Exception {
+        Constructor<SampleTarget> constructor = getCollectionArrayConstructor();
+
+        thenCode(() -> ValidatorConstructorAdvice.onMethodEnter(constructor, new Object[]{"Alice", List.of("item"), new String[]{"tag"}, new int[]{1}}))
             .doesNotThrowAnyException();
     }
 }

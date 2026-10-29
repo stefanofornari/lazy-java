@@ -20,6 +20,13 @@
         </dependency>
 
         <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy-agent</artifactId>
+            <version>1.15.5</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
@@ -48,6 +55,14 @@
                     <annotationProcessors>
                         <annotationProcessor>ste.lazyjava.processor.£Processor</annotationProcessor>
                     </annotationProcessors>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+                <configuration>
+                    <argLine>-javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/1.15.5/byte-buddy-agent-1.15.5.jar</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -84,6 +99,22 @@
             <plugin>
                 <groupId>com.github.stefanofornari</groupId>
                 <artifactId>lazyjava-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>weave-main</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>weave</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>weave-test</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>weave</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
