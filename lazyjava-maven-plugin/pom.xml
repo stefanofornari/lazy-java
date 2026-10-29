@@ -88,7 +88,10 @@
         </plugins>
     </build>
 
-  <scm>
-    <tag>lazyjava-maven-plugin-0.0.1</tag>
-  </scm>
+    <scm>
+        <connection>scm:git:https://github.com/stefanofornari/lazy-java.git</connection>
+        <developerConnection>scm:git:git@github.com:stefanofornari/lazy-java.git</developerConnection>
+        <url>https://github.com/stefanofornari/lazy-java</url>
+        <tag>lazyjava-maven-plugin-0.0.1</tag>
+    </scm>
 </project>
