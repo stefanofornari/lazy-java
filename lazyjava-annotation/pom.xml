@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.github.stefanofornari</groupId>
         <artifactId>lazyjava-parent</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.2</version>
     </parent>
 
     <artifactId>lazyjava-annotation</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>LazyJava Annotation Processor</name>
 
@@ -41,12 +41,10 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.15.5</version>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy-agent</artifactId>
-            <version>1.15.5</version>
         </dependency>
 
         <!-- JUnit 5 -->
@@ -96,6 +94,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

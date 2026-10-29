@@ -33,3 +33,4 @@ failsafe-reports/
 # Generated sources
 generated-sources/
 generated-test-sources/
+.flattened-pom.xml
