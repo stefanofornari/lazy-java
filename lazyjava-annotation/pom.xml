@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.stefanofornari</groupId>
         <artifactId>lazyjava-parent</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>lazyjava-annotation</artifactId>
@@ -99,7 +99,10 @@
         </plugins>
     </build>
 
-  <scm>
-    <tag>lazyjava-annotation-0.0.1</tag>
-  </scm>
+    <scm>
+        <connection>scm:git:https://github.com/stefanofornari/lazy-java.git</connection>
+        <developerConnection>scm:git:git@github.com:stefanofornari/lazy-java.git</developerConnection>
+        <url>https://github.com/stefanofornari/lazy-java</url>
+        <tag>lazyjava-annotation-0.0.1</tag>
+    </scm>
 </project>
