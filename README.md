@@ -5,7 +5,7 @@ LazyJava is a Java annotation processor and Maven plugin that generates factory 
 ## Modules
 
 - `lazyjava-annotation` — annotations (`@£` / `@LClass`, `@NonNull`, `@NonBlank`, `@NonEmpty`) and the annotation processor that generates package-level `£` interfaces with static factory methods.
-- `lazyjava-core` — tests and usage examples for the annotation processor.
+- `lazyjava-core` — runtime helpers: `Safe` (null/empty/blank guards) and `ste.lazyjava.logging.ConfigurableFileHandler`, a JUL `FileHandler` configurable entirely from `logging.properties` (system folders via `${dataDir}`, `${cacheDir}`, `${configDir}`, plus `${env.X}` and system properties in the pattern; always size-capped).
 - `lazyjava-maven-plugin` — Maven plugin that instruments compiled classes at build time so runtime validation is enforced without manual agent setup.
 - `lazyjava-examples` — sample project demonstrating end-to-end usage.
 
