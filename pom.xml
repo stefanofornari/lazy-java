@@ -44,8 +44,6 @@
         <project.license.url>https://www.apache.org/licenses/LICENSE-2.0.txt</project.license.url>
         <project.developer.id>stefanofornari</project.developer.id>
         <project.developer.name>Stefano Fornari</project.developer.name>
-        <project.developer.email>stefano.fornari@gmail.com</project.developer.email>
-        <project.developer.timezone>Europe/Rome</project.developer.timezone>
     </properties>
 
     <dependencyManagement>
@@ -95,10 +93,8 @@
 
     <developers>
         <developer>
-            <id>stefanofornari</id>
-            <name>Stefano Fornari</name>
-            <email>stefano.fornari@gmail.com</email>
-            <timezone>Europe/Rome</timezone>
+            <id>${project.developer.id}</id>
+            <name>${project.developer.name}</name>
         </developer>
     </developers>
 

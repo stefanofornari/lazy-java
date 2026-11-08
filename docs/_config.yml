@@ -1,0 +1,9 @@
+title: LazyJava
+description: Java annotation processor and Maven plugin for factory generation and runtime parameter validation.
+theme: jekyll-theme-cayman
+markdown: kramdown
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
