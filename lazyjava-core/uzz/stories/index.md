@@ -19,6 +19,18 @@
 | core/docs/US-000007 | Publish LazyJava Documentation via GitHub Pages | WIP |
 | core/docs/US-000009 | Clarify Java Version and Toolchain Compatibility in GitHub Pages and README | WIP |
 
+## logging
+
+| id | title | status |
+|---|---|---|
+| logging/US-000010 | Configure a File Log Handler from logging.properties | TODO |
+| logging/US-000011 | Keep the Log File Size Bounded by Default | TODO |
+| logging/US-000012 | Create the Log Folder When Missing | TODO |
+| logging/US-000013 | Place the Log File in the System Folders of the Application | TODO |
+| logging/US-000014 | Use System Properties and Environment Variables in the Log File Pattern | TODO |
+| logging/US-000015 | Report a Log File Failure Through JUL and Keep Logging Elsewhere | TODO |
+| logging/US-000016 | Document the File Log Handler | TODO |
+
 ### Keywords
 - stories
 - index
