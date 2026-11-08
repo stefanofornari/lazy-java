@@ -9,6 +9,7 @@ Functional domains:
 - **Safe utility API (`ste.lazyjava.safe.Safe`)**: Default-method interface providing null/blank/empty guard helpers and conditional execution (`ifNull`/`ifNotNull`/`safe`) with `IllegalArgumentException`-based requirement checks (including fully-non-null checks for arrays/lists).
 - **Annotation-processing integration (module build)**: Maven compiler configuration runs `ste.lazyjava.processor.£Processor` (from `lazyjava-annotation`) and includes generated annotation sources during build.
 - **Build-time weaving integration (module build)**: Maven build wires `lazyjava-maven-plugin` (goal `weave`, as used by the module/parent configuration) for ByteBuddy-based instrumentation in the LazyJava workflow.
+- **Logging (`ste.lazyjava.logging.FileLogHandler`)**: a JUL file handler configured entirely from `logging.properties`, with `${...}` tokens (system folders, system properties, environment) in its pattern; see [logging/scope.md](logging/scope.md).
 - **Verification/tests**: JUnit 5 + AssertJ tests for module behavior (currently `SafeTest`).
 
 ## In-Scope Capabilities
@@ -36,6 +37,9 @@ Functional domains:
   - Project Overview: `lazyjava-core/uzz/project/overview.md`
   - Coding Standard: `lazyjava-core/uzz/project/coding_standard.md`
   - Development Framework: `lazyjava-core/uzz/project/development_framework.md`
+
+### Domain scopes
+- [Logging](logging/scope.md)
 
 ### Keywords
 - scope
