@@ -23,13 +23,13 @@
 
 | id | title | status |
 |---|---|---|
-| logging/US-000010 | Configure a File Log Handler from logging.properties | TODO |
-| logging/US-000011 | Keep the Log File Size Bounded by Default | TODO |
-| logging/US-000012 | Create the Log Folder When Missing | TODO |
-| logging/US-000013 | Place the Log File in the System Folders of the Application | TODO |
-| logging/US-000014 | Use System Properties and Environment Variables in the Log File Pattern | TODO |
-| logging/US-000015 | Report a Log File Failure Through JUL and Keep Logging Elsewhere | TODO |
-| logging/US-000016 | Document the File Log Handler | TODO |
+| logging/US-000010 | Configure a File Log Handler from logging.properties | WIP |
+| logging/US-000011 | Keep the Log File Size Bounded by Default | WIP |
+| logging/US-000012 | Create the Log Folder When Missing | WIP |
+| logging/US-000013 | Place the Log File in the System Folders of the Application | WIP |
+| logging/US-000014 | Use System Properties and Environment Variables in the Log File Pattern | WIP |
+| logging/US-000015 | Report a Log File Failure Through JUL and Keep Logging Elsewhere | WIP |
+| logging/US-000016 | Document the File Log Handler | WIP |
 
 ### Keywords
 - stories
