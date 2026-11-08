@@ -98,3 +98,4 @@ public class UserService {
 
 - Review [Requirements and compatibility](requirements.md).
 - See [Modules](modules.md) for module responsibilities.
+- Configure logging to a rolling file with [File log handler](logging.md).

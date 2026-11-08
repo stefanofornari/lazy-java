@@ -16,6 +16,7 @@ Detailed usage and compatibility guidance is published in the GitHub Pages site:
 - [Getting started](https://stefanofornari.github.io/lazy-java/getting-started.html)
 - [Requirements and compatibility](https://stefanofornari.github.io/lazy-java/requirements.html)
 - [Modules](https://stefanofornari.github.io/lazy-java/modules.html)
+- [File log handler](https://stefanofornari.github.io/lazy-java/logging.html)
 
 ## Quick start
 

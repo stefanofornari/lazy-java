@@ -13,7 +13,10 @@ Provides annotations and the annotation processor:
 
 Core runtime utilities for LazyJava-based code.
 
-Current implemented API: `ste.lazyjava.safe.Safe` (default-method interface).
+Current implemented API:
+
+- `ste.lazyjava.safe.Safe` (default-method interface)
+- `ste.lazyjava.logging.FileLogHandler` (a `java.util.logging` file handler configured entirely from `logging.properties`; see [File log handler](logging.md))
 
 | Capability | Methods |
 |---|---|
@@ -22,6 +25,8 @@ Current implemented API: `ste.lazyjava.safe.Safe` (default-method interface).
 | String validation | `requireNonEmpty`, `requireNonBlank` |
 
 Validation failures throw `IllegalArgumentException` with parameter-name-based messages.
+
+`FileLogHandler` expands `${dataDir}`, `${cacheDir}`, `${configDir}`, `${application}`, `${env.NAME}` and system properties in the log file pattern, creates the log folder and keeps the log size bounded by default. Details, settings and an example are in [File log handler](logging.md).
 
 ## `lazyjava-maven-plugin`
 
