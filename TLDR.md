@@ -2,7 +2,7 @@
 
 > LazyJava is a multi-module Maven project (Apache-2.0, author Stefano Fornari, repository https://github.com/stefanofornari/lazy-java, group id `com.github.stefanofornari`) that removes boilerplate from Java code: (1) an annotation processor generates static factory methods, (2) a Maven plugin weaves runtime parameter validation into compiled classes with ByteBuddy, (3) `lazyjava-core` provides small runtime utilities: null/blank/empty guards (`Safe`) and a `java.util.logging` file handler configured entirely from `logging.properties` (`FileLogHandler`).
 
-This file is a summary for LLMs and tools. Keep it in sync with the code; the code, tests and `docs/` are authoritative. Human documentation: https://stefanofornari.github.io/lazy-java/ (sources in `docs/`).
+This file is a short summary for quick readers, LLMs and tools. Keep it in sync with the code; the code, tests and `docs/` are authoritative. Human documentation: https://stefanofornari.github.io/lazy-java/ (sources in `docs/`).
 
 ## Modules
 
