@@ -70,6 +70,19 @@ class FileLogHandlerTest {
         }
     }
 
+    /** Creates the handler, closes it, and returns what it wrote on System.err. */
+    private String createCapturingStderr() throws Exception {
+        final PrintStream err = System.err;
+        final ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(captured, true));
+        try {
+            new FileLogHandler().close();
+        } finally {
+            System.setErr(err);
+        }
+        return captured.toString();
+    }
+
     // --- US-000010: configuration from logging.properties ---
 
     @Test
@@ -237,12 +250,13 @@ class FileLogHandlerTest {
     }
 
     @Test
-    void requires_the_application_name_for_the_system_folders() throws Exception {
-        configure(P + "pattern = ${dataDir}/x.%g.log");
+    void leaves_the_system_folder_token_and_warns_when_the_application_is_missing() throws Exception {
+        configure(P + "pattern = " + slash(dir) + "/${dataDir}/x.%g.log");
 
-        thenThrownBy(FileLogHandler::new)
-            .isInstanceOf(IOException.class)
-            .hasMessageContaining("application");
+        final String err = createCapturingStderr();
+
+        then(dir.resolve("${dataDir}/x.0.log")).exists();
+        then(err).contains("${dataDir}").contains("application");
     }
 
     // --- US-000014: system properties and environment ---
@@ -284,19 +298,58 @@ class FileLogHandlerTest {
     }
 
     @Test
-    void fails_clearly_on_an_unknown_token() throws Exception {
-        configure(P + "pattern = ${nothing.here}/app.%g.log");
+    void leaves_an_unknown_token_intact_and_warns() throws Exception {
+        configure(P + "pattern = " + slash(dir) + "/${nothing.here}/app.%g.log");
 
-        thenThrownBy(FileLogHandler::new)
-            .isInstanceOf(IOException.class)
-            .hasMessageContaining("${nothing.here}");
+        final String err = createCapturingStderr();
+
+        then(dir.resolve("${nothing.here}/app.0.log")).exists();
+        then(err).contains("${nothing.here}");
     }
 
     @Test
-    void fails_clearly_on_an_unterminated_token() throws Exception {
-        configure(P + "pattern = ${nothing/app.%g.log");
+    void leaves_an_unset_environment_variable_intact_and_warns() throws Exception {
+        configure(P + "pattern = " + slash(dir) + "/${env.LAZYTEST_SURELY_UNSET}/app.%g.log");
 
-        thenThrownBy(FileLogHandler::new).isInstanceOf(IOException.class);
+        final String err = createCapturingStderr();
+
+        then(dir.resolve("${env.LAZYTEST_SURELY_UNSET}/app.0.log")).exists();
+        then(err).contains("${env.LAZYTEST_SURELY_UNSET}");
+    }
+
+    @Test
+    void leaves_an_unterminated_token_intact_and_warns() throws Exception {
+        configure(P + "pattern = " + slash(dir) + "/${nothing/app.%g.log");
+
+        final String err = createCapturingStderr();
+
+        then(dir.resolve("${nothing/app.0.log")).exists();
+        then(err).contains("${nothing");
+    }
+
+    @Test
+    void warns_once_per_unresolved_token_and_resolves_the_others() throws Exception {
+        System.setProperty("lazytest.dir", slash(dir));
+        try {
+            configure(P + "pattern = ${lazytest.dir}/${nope}/${nope}.%g.log");
+
+            final String err = createCapturingStderr();
+
+            then(dir.resolve("${nope}/${nope}.0.log")).exists();
+            then(err.split("\\$\\{nope\\}", -1).length - 1).isEqualTo(1);
+        } finally {
+            System.clearProperty("lazytest.dir");
+        }
+    }
+
+    @Test
+    void writes_the_warning_in_the_log_file_too() throws Exception {
+        configure(P + "pattern = " + slash(dir) + "/${nothing.here}/app.%g.log");
+
+        createCapturingStderr();
+
+        final String content = Files.readString(dir.resolve("${nothing.here}/app.0.log"));
+        then(content).contains("WARNING").contains("${nothing.here}");
     }
 
     // --- US-000015: failures are reported by JUL, other handlers keep working ---
