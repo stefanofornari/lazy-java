@@ -1,5 +1,5 @@
 title: LazyJava
-description: Java annotation processor and Maven plugin for factory generation and runtime parameter validation.
+description: A collection of small Java utilities that make tedious things easier - argument validation by annotation, class-level facilities, safer null handling.
 theme: jekyll-theme-cayman
 markdown: kramdown
 plugins:
