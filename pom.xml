@@ -24,7 +24,7 @@
     <version>0.0.2</version>
     <packaging>pom</packaging>
     <name>LazyJava Parent Project</name>
-    <description>A collection of small Java utilities that make tedious things easier: argument validation by annotation, class-level facilities, safer null handling</description>
+    <description>A collection of small Java utilities that make tedious things easier: argument validation by annotation, class-level facilities, safer null handling, log files in system folders</description>
     <url>https://github.com/stefanofornari/lazy-java</url>
 
     <modules>

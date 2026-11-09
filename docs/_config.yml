@@ -1,5 +1,5 @@
 title: LazyJava
-description: A collection of small Java utilities that make tedious things easier - argument validation by annotation, class-level facilities, safer null handling.
+description: A collection of small Java utilities that make tedious things easier - argument validation by annotation, class-level facilities, safer null handling, log files in system folders.
 theme: jekyll-theme-cayman
 markdown: kramdown
 plugins:
