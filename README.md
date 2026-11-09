@@ -17,6 +17,7 @@ Detailed usage and compatibility guidance is published in the GitHub Pages site:
 - [Requirements and compatibility](https://stefanofornari.github.io/lazy-java/requirements.html)
 - [Modules](https://stefanofornari.github.io/lazy-java/modules.html)
 - [File log handler](https://stefanofornari.github.io/lazy-java/logging.html)
+- [`llms.txt`](llms.txt) — a summary of the whole project for LLMs and tools
 
 ## Quick start
 
