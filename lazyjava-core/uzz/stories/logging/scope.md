@@ -15,8 +15,9 @@ Decisions taken while scoping:
 * **Own namespace**: settings are read from the `LogManager` under the class name (`ste.lazyjava.logging.FileLogHandler.<name>`), so it can coexist with a plain `FileHandler`.
 * **Bounded by default**: the log never grows indefinitely, even if `limit` and `count` are not set (1 000 000 bytes, 3 files).
 * **System folders**: found with [directories-jvm](https://codeberg.org/dirs/directories-jvm) (`dev.dirs:directories`), the library for any system folder in this project.
-* **Application name is required** when a system-folder token is used: no generic folder such as `app` is ever created.
-* **On failure the handler throws** (`IOException`); JUL reports it and the other handlers keep working. No fallback location, no silence.
+* **Application name is required** to resolve a system-folder token: no generic folder such as `app` is ever created; without it the token is left as is and a warning is reported.
+* **If the file cannot be created the handler throws** (`IOException`); JUL reports it and the other handlers keep working. No fallback location, no silence.
+* **Unresolved tokens do not throw** (decision of 2026-11-09): the token is left as it is in the pattern and a warning is reported once, so the log is not lost because of a wrong placeholder and the file name shows the problem.
 * **Default formatter is `SimpleFormatter`** when none is configured (the JDK default would be XML), so the file is readable out of the box.
 
 ## In-Scope Capabilities
@@ -28,7 +29,7 @@ Decisions taken while scoping:
   - [ ] `${dataDir}`, `${cacheDir}`, `${configDir}`: the system folders of the application (via directories-jvm, from `application`, `qualifier`, `organization`)
   - [ ] `${application}`: the configured application name
   - [ ] `${env.NAME}`: an environment variable; any other `${name}` is a system property
-  - [ ] A token that cannot be resolved, or a system-folder token without `application`, fails with a message naming the token
+  - [ ] A token that cannot be resolved, or a system-folder token without `application`, is left as is in the pattern and a warning naming it is reported once (first record of the file and `System.err`)
   - [ ] Expanded values are safe in a `FileHandler` pattern: `\` becomes `/` and `%` is escaped; the literal `%g`, `%u`, `%h`, `%t` of the pattern keep their JDK meaning
   - [ ] Default pattern `${dataDir}/logs/${application}.%g.log`
 * **File handling**:

@@ -21,8 +21,14 @@ import dev.dirs.ProjectDirectories;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
 /**
@@ -78,19 +84,36 @@ import java.util.logging.SimpleFormatter;
  * Expanded values are safe in a pattern ({@code \} becomes {@code /}, {@code %} is escaped); the
  * literal {@code %g}, {@code %u}, {@code %h} and {@code %t} of the pattern keep their JDK meaning.
  *
+ * <h2>Tokens that cannot be resolved</h2>
+ * A token with no value (unknown name, unset environment variable, a system folder token without
+ * {@code application}, a token with no closing brace) never stops the logging: it is left as is in
+ * the pattern, so the file name shows what is wrong, and a warning is reported once per token, as
+ * the first record of the log file and on {@code System.err}.
+ *
  * <h2>Failures</h2>
- * If the file cannot be created, a token cannot be resolved or the application is missing, the
- * constructor throws an {@link IOException}. The {@code LogManager} reports it on {@code System.err}
- * and the other handlers (e.g. the console) keep working; there is no fallback location.
+ * If the file cannot be created the constructor throws an {@link IOException}. The
+ * {@code LogManager} reports it on {@code System.err} and the other handlers (e.g. the console)
+ * keep working; there is no fallback location.
  */
 public class FileLogHandler extends FileHandler {
 
+    /** Bytes per file when {@code limit} is not configured. */
     public static final int DEFAULT_LIMIT = 1_000_000;
+    /** Number of files when {@code count} is not configured. */
     public static final int DEFAULT_COUNT = 3;
+    /** Pattern when {@code pattern} is not configured. */
     public static final String DEFAULT_PATTERN = "${dataDir}/logs/${application}.%g.log";
 
     private static final String PREFIX = FileLogHandler.class.getName() + ".";
 
+    /** Warnings found while the pattern is expanded, i.e. before the handler exists to report them. */
+    private static final ThreadLocal<Set<String>> UNRESOLVED = ThreadLocal.withInitial(LinkedHashSet::new);
+
+    /**
+     * Creates the handler from the settings of the {@code LogManager}.
+     *
+     * @throws IOException if the log file cannot be created
+     */
     public FileLogHandler() throws IOException {
         super(
             preparePattern(),
@@ -102,67 +125,89 @@ public class FileLogHandler extends FileHandler {
         if (property("formatter", null) == null) {
             setFormatter(new SimpleFormatter());
         }
+        reportUnresolvedTokens();
+    }
+
+    private void reportUnresolvedTokens() {
+        final List<String> warnings = new ArrayList<>(UNRESOLVED.get());
+        UNRESOLVED.remove();
+        for (String warning : warnings) {
+            final LogRecord record = new LogRecord(Level.WARNING, warning);
+            record.setLoggerName(FileLogHandler.class.getName());
+            publish(record);
+            System.err.println("WARNING " + FileLogHandler.class.getName() + ": " + warning);
+        }
+        flush();
     }
 
     /**
      * Expands the {@code ${...}} tokens of the template. Values are made safe for a
-     * {@code FileHandler} pattern; the literal text of the template is left untouched.
+     * {@code FileHandler} pattern; the literal text of the template is left untouched. A token
+     * with no value stays as it is and is recorded in {@link #UNRESOLVED}.
      */
-    static String expand(final String template) throws IOException {
+    static String expand(final String template) {
         final StringBuilder out = new StringBuilder();
         int from = 0;
         for (int start; (start = template.indexOf("${", from)) >= 0; ) {
             final int end = template.indexOf('}', start);
             if (end < 0) {
-                throw new IOException("Unterminated token in log pattern " + template);
+                unresolved("Unterminated token " + template.substring(start) + " in the log pattern; left as is");
+                break;
             }
             out.append(template, from, start);
-            out.append(escape(resolve(template.substring(start + 2, end), template)));
+            final String token = template.substring(start, end + 1);
+            final String value = resolve(token.substring(2, token.length() - 1));
+            out.append(value == null ? token : escape(value));
             from = end + 1;
         }
         return out.append(template.substring(from)).toString();
     }
 
-    private static String resolve(final String name, final String template) throws IOException {
-        final String value;
+    /** @return the value of the token's name, or null (after recording why) if there is none */
+    private static String resolve(final String name) {
+        String value = null;
         switch (name) {
             case "application":
                 value = application(name);
                 break;
             case "dataDir":
-                value = directories(name).dataLocalDir;
-                break;
             case "cacheDir":
-                value = directories(name).cacheDir;
-                break;
             case "configDir":
-                value = directories(name).configDir;
+                value = systemFolder(name);
                 break;
             default:
-                value = name.startsWith("env.")
-                      ? System.getenv(name.substring(4))
-                      : System.getProperty(name);
-        }
-        if (value == null) {
-            throw new IOException("Unknown token ${" + name + "} in log pattern " + template);
+                value = name.startsWith("env.") ? System.getenv(name.substring(4)) : System.getProperty(name);
+                if (value == null) {
+                    unresolved("Cannot resolve ${" + name + "} in the log pattern; left as is");
+                }
         }
         return value;
     }
 
-    private static String application(final String token) throws IOException {
+    private static String systemFolder(final String name) {
+        final String application = application(name);
+        if (application == null) {
+            return null;
+        }
+        final ProjectDirectories dirs = ProjectDirectories.from(
+            property("qualifier", ""), property("organization", ""), application
+        );
+        return "dataDir".equals(name) ? dirs.dataLocalDir
+             : "cacheDir".equals(name) ? dirs.cacheDir
+             : dirs.configDir;
+    }
+
+    private static String application(final String token) {
         final String application = property("application", null);
         if (application == null) {
-            throw new IOException(
-                "The setting " + PREFIX + "application is required to use ${" + token + "} in the log pattern"
-            );
+            unresolved("Cannot resolve ${" + token + "} in the log pattern: the setting " + PREFIX
+                + "application is not set; left as is");
         }
         return application;
     }
 
-    private static ProjectDirectories directories(final String token) throws IOException {
-        return ProjectDirectories.from(
-            property("qualifier", ""), property("organization", ""), application(token)
-        );
+    private static void unresolved(final String warning) {
+        UNRESOLVED.get().add(warning);
     }
 
     private static String escape(final String value) {
@@ -170,6 +215,7 @@ public class FileLogHandler extends FileHandler {
     }
 
     private static String preparePattern() throws IOException {
+        UNRESOLVED.remove();
         final String pattern = expand(property("pattern", DEFAULT_PATTERN));
         createFolderOf(pattern);
         return pattern;

@@ -49,7 +49,7 @@ All settings are read under `ste.lazyjava.logging.FileLogHandler.`. The settings
 | `append` | `true` | Append to an existing file |
 | `formatter` | `java.util.logging.SimpleFormatter` | Formatter class (the JDK default would be XML) |
 | `level`, `filter`, `encoding` | as `FileHandler` | |
-| `application` | none | Application name; **required** by the system folder tokens |
+| `application` | none | Application name; **required** to resolve the system folder tokens |
 | `qualifier`, `organization` | empty | Refine the system folders (see directories-jvm) |
 
 The size is always bounded: a missing, invalid or too small `limit` or `count` falls back to the defaults, so the log never grows indefinitely.
@@ -65,8 +65,10 @@ The size is always bounded: a missing, invalid or too small `limit` or `count` f
 | `${env.NAME}` | The environment variable `NAME` |
 | `${name}` | Any other name: the system property `name` |
 
-Expanded values are safe in a `FileHandler` pattern: `\` becomes `/` and `%` is escaped. The literal `%g`, `%u`, `%h` and `%t` written in the pattern keep their JDK meaning. The folder of the file is created when it does not exist.
+A token that cannot be resolved is left as it is and reported with a warning (see below). Expanded values are safe in a `FileHandler` pattern: `\` becomes `/` and `%` is escaped. The literal `%g`, `%u`, `%h` and `%t` written in the pattern keep their JDK meaning. The folder of the file is created when it does not exist.
 
 ## When something is wrong
 
-If the file cannot be created, a token cannot be resolved (the message names the token), the token is not terminated, or `application` is missing for a system folder token, the constructor throws an `IOException`. The `LogManager` reports it on `System.err` and the other handlers, such as the console, keep working. There is no fallback location: fix the configuration.
+**A token with no value** (unknown name, unset environment variable, a system folder token without `application`, a `${` with no closing brace) never stops the logging. The token is left as it is in the pattern, so the file name shows what is wrong, and a warning naming it is reported once: it is the first record of the log file and it is written on `System.err`. For example, with no `application` the file ends up in a folder literally named `${dataDir}`.
+
+**A file that cannot be created** (for example a folder that is not writable) makes the constructor throw an `IOException`. The `LogManager` reports it on `System.err` and the other handlers, such as the console, keep working. There is no fallback location: fix the configuration.
